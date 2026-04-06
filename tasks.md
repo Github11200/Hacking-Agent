@@ -1,0 +1,9 @@
+- Get user prompt on what they want to do.
+- Figure out what packages are needed
+  - Scrape kali for a list of tools
+- Install the packages
+  - Check through pacman -Ss
+  - Check through yay -Ss
+  - Check through the Snap store
+- Get information on how to use the tool using toolName --help
+- Run the commands in a loop until the task is achieved
