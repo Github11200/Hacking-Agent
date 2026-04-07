@@ -1,109 +1,7 @@
 import { createStep, createWorkflow } from "@mastra/core/workflows";
 import { z } from "zod";
 import { ToolsList } from "../lib/types";
-
-export const tools = [
-  "hashcat",
-  "hydra",
-  "metasploit-framework",
-  "gemini-cli",
-  "nmap",
-  "wireshark",
-  "aircrack-ng",
-  "wifite",
-  "responder",
-  "fluxion",
-  "powershell",
-  "sherlock",
-  "hping3",
-  "sqlmap",
-  "bloodhound",
-  "gobuster",
-  "autopsy",
-  "maltego",
-  "impacket-scripts",
-  "netcat",
-  "dirb",
-  "snort",
-  "whatweb",
-  "amass",
-  "ettercap",
-  "mimikatz",
-  "theharvester",
-  "subfinder",
-  "steghide",
-  "recon-ng",
-  "reaver",
-  "nikto",
-  "john",
-  "crunch",
-  "hexstrike-ai",
-  "dnsrecon",
-  "dnsenum",
-  "dirbuster",
-  "bettercap",
-  "wpscan",
-  "dirsearch",
-  "crackmapexec",
-  "beef-xss",
-  "airgeddon",
-  "parsero",
-  "netexec",
-  "netdiscover",
-  "mitm6",
-  "armitage",
-  "sublist3r",
-  "macchanger",
-  "evil-winrm",
-  "dmitry",
-  "chisel",
-  "binwalk",
-  "yara",
-  "wifiphisher",
-  "scapy",
-  "ffuf",
-  "feroxbuster",
-  "arjun",
-  "yersinia",
-  "tiger",
-  "tcpdump",
-  "sstimap",
-  "spiderfoot",
-  "smtp-user-enum",
-  "rainbowcrack",
-  "medusa",
-  "ligolo-ng",
-  "kismet",
-  "fern-wifi-cracker",
-  "enum4linux",
-  "caido",
-  "bulk-extractor",
-  "autorecon",
-  "assetfinder",
-  "veil",
-  "tinja",
-  "sqlsus",
-  "pspy",
-  "ollydbg",
-  "nuclei",
-  "metagoofil",
-  "maryam",
-  "legion",
-  "kerberoast",
-  "jadx",
-  "hoaxshell",
-  "hashid",
-  "goldeneye",
-  "ghidra",
-  "dsniff",
-  "cowpatty",
-  "cewl",
-  "capstone",
-  "cadaver",
-  "burpsuite",
-  "arp-scan",
-  "apktool",
-];
+import { toolNamesList } from "../lib/lib";
 
 const getTools = createStep({
   id: "get-tools",
@@ -128,7 +26,7 @@ const getTools = createStep({
     These are the tools on the Kali Linux website:
     `;
 
-    tools.forEach((tool, _, __) => {
+    toolNamesList.forEach((tool, _, __) => {
       prompt += `- ${tool}\n`;
     });
 
@@ -149,6 +47,23 @@ const getTools = createStep({
     const toolsList: ToolsList = JSON.parse(jsonResponse);
 
     return toolsList;
+  },
+});
+
+const installTools = createStep({
+  id: "install-tools",
+  description: "Installs the tools based on the package names",
+  inputSchema: z.object({
+    tools: z.array(
+      z.object({
+        name: z.string(),
+        installCommand: z.string(),
+      }),
+    ),
+  }),
+  execute: async (toolsToInstall) => {
+    for (let tool of toolsToInstall.tools) {
+    }
   },
 });
 

@@ -2,6 +2,7 @@ import { Agent } from "@mastra/core/agent";
 import { ollamaModel } from "../lib/lib";
 import { getPackageInformation } from "../tools/package-info-tool";
 import { Memory } from "@mastra/memory";
+import { searchPackageRepository } from "../tools/search-package";
 
 const memory = new Memory();
 
@@ -34,6 +35,6 @@ RULES:
 - Extract "install command" from package info "How to install" section
 - Output ONLY valid JSON, 2-4 tools maximum`,
   model: ollamaModel,
-  tools: { getPackageInformation },
+  tools: { getPackageInformation, searchPackageRepository },
   memory,
 });
