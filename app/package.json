@@ -28,7 +28,9 @@
     "@mastra/memory": "^1.13.1",
     "@mastra/observability": "^1.7.2",
     "@opentui/core": "^0.1.96",
+    "cheerio": "^1.2.0",
     "ollama-ai-provider-v2": "^3.5.0",
+    "puppeteer": "^24.40.0",
     "zod": "^4"
   }
 }

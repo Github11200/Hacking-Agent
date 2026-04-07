@@ -1,6 +1,3 @@
-- Get user prompt on what they want to do.
-- Figure out what packages are needed
-  - Scrape kali for a list of tools
 - Install the packages
   - Check through pacman -Ss
   - Check through yay -Ss

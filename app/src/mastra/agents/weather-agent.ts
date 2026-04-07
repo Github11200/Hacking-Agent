@@ -1,12 +1,12 @@
 import { Agent } from "@mastra/core/agent";
 import { Memory } from "@mastra/memory";
 import { weatherTool } from "../tools/weather-tool";
-import { createOllama } from "ollama-ai-provider-v2";
 import {
   Workspace,
   LocalFilesystem,
   LocalSandbox,
 } from "@mastra/core/workspace";
+import { ollamaModel } from "../lib/lib";
 
 const workspace = new Workspace({
   filesystem: new LocalFilesystem({
@@ -15,10 +15,6 @@ const workspace = new Workspace({
   sandbox: new LocalSandbox({
     workingDirectory: "./workspace",
   }),
-});
-
-const ollama = createOllama({
-  baseURL: "http://localhost:3000/api",
 });
 
 export const weatherAgent = new Agent({
@@ -38,7 +34,7 @@ export const weatherAgent = new Agent({
 
       Use the weatherTool to fetch current weather data.
 `,
-  model: ollama("gemma4:e4b"),
+  model: ollamaModel,
   tools: { weatherTool },
   workspace,
 });
