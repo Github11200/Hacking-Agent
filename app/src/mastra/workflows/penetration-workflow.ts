@@ -2,6 +2,8 @@ import { createStep, createWorkflow } from "@mastra/core/workflows";
 import { z } from "zod";
 import { ToolsList } from "../lib/types";
 import { toolNamesList } from "../lib/lib";
+import { toolPickerAgent } from "../agents/tool-picker-agent";
+import { toolInstallerAgent } from "../agents/tool-installer-agent";
 
 const getTools = createStep({
   id: "get-tools",
@@ -18,9 +20,7 @@ const getTools = createStep({
       }),
     ),
   }),
-  execute: async ({ inputData, mastra }) => {
-    const toolPickerAgent = mastra?.getAgent("toolPickerAgent");
-
+  execute: async ({ inputData }) => {
     let prompt = `This is what the user would like to achieve: ${inputData}
 
     These are the tools on the Kali Linux website:
@@ -64,6 +64,7 @@ const installTools = createStep({
   execute: async (toolsToInstall) => {
     for (let tool of toolsToInstall.tools) {
     }
+    // Use the toolInstallerAgent
   },
 });
 
@@ -81,5 +82,5 @@ const penetrationWorkflow = createWorkflow({
         "The result of the penetration test and and vulnerabilities found.",
       ),
   }),
-  steps: [getTools],
+  steps: [getTools, installTools],
 });

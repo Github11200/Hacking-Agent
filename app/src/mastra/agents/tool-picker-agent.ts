@@ -2,11 +2,10 @@ import { Agent } from "@mastra/core/agent";
 import { ollamaModel } from "../lib/lib";
 import { getPackageInformation } from "../tools/package-info-tool";
 import { Memory } from "@mastra/memory";
-import { searchPackageRepository } from "../tools/search-package";
 
 const memory = new Memory();
 
-export const toolAgent = new Agent({
+export const toolPickerAgent = new Agent({
   id: "tool-picker-agent",
   name: "Tool Picker Agent",
   instructions: `You pick the most relevant Kali Linux security tools for the user's objective.
@@ -35,6 +34,6 @@ RULES:
 - Extract "install command" from package info "How to install" section
 - Output ONLY valid JSON, 2-4 tools maximum`,
   model: ollamaModel,
-  tools: { getPackageInformation, searchPackageRepository },
+  tools: { getPackageInformation },
   memory,
 });

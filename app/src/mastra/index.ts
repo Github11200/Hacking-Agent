@@ -11,11 +11,11 @@ import {
 } from "@mastra/observability";
 import { weatherWorkflow } from "./workflows/weather-workflow";
 import { weatherAgent } from "./agents/weather-agent";
-import { toolAgent } from "./agents/tool-picker-agent";
+import { toolPickerAgent } from "./agents/tool-picker-agent";
 
 export const mastra = new Mastra({
   workflows: { weatherWorkflow },
-  agents: { weatherAgent, toolAgent },
+  agents: { weatherAgent, toolAgent: toolPickerAgent },
   storage: new MastraCompositeStore({
     id: "composite-storage",
     default: new LibSQLStore({
