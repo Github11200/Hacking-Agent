@@ -12,10 +12,18 @@ import {
 import { weatherWorkflow } from "./workflows/weather-workflow";
 import { weatherAgent } from "./agents/weather-agent";
 import { toolPickerAgent } from "./agents/tool-picker-agent";
+import { toolInstallerAgent } from "./agents/tool-installer-agent";
+import { penetrationAgent } from "./agents/penetrator-agent";
+import { penetrationWorkflow } from "./workflows/penetration-workflow";
 
 export const mastra = new Mastra({
-  workflows: { weatherWorkflow },
-  agents: { weatherAgent, toolAgent: toolPickerAgent },
+  workflows: { weatherWorkflow, penetrationWorkflow },
+  agents: {
+    weatherAgent,
+    toolPickerAgent,
+    toolInstallerAgent,
+    penetrationAgent,
+  },
   storage: new MastraCompositeStore({
     id: "composite-storage",
     default: new LibSQLStore({

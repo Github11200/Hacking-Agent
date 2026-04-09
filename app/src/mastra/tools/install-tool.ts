@@ -27,7 +27,13 @@ export const installTool = new Tool({
         packageInformation.package,
         "--noconfirm",
       ]);
-    else installCommand = spawn("sudo", ["pacman", "-Syu", "--noconfirm"]);
+    else
+      installCommand = spawn("sudo", [
+        "pacman",
+        "-S",
+        packageInformation.package,
+        "--noconfirm",
+      ]);
 
     installCommand.stdout.on("data", (data) => {
       const decoder = new StringDecoder("utf8");
@@ -35,8 +41,18 @@ export const installTool = new Tool({
       console.log(message.trim());
     });
 
-    // Check when the command is done then return a result
+    const commandResult: string | boolean = await new Promise(
+      (resolve, reject) => {
+        installCommand.on("exit", (_) => {
+          resolve(true);
+        });
 
-    return false;
+        installCommand.on("error", (err) => {
+          reject(err.message);
+        });
+      },
+    );
+
+    return commandResult;
   },
 });
