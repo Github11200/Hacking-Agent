@@ -1,6 +1,6 @@
 import { createStep, createWorkflow } from "@mastra/core/workflows";
 import { z } from "zod";
-import { InstallationStatus, ToolsList } from "../lib/types";
+import { InstallationResults, ToolsList } from "../lib/types";
 import { toolNamesList } from "../lib/lib";
 import { toolPickerAgent } from "../agents/tool-picker-agent";
 import { toolInstallerAgent } from "../agents/tool-installer-agent";
@@ -70,26 +70,43 @@ const installTools = createStep({
     .array(z.string())
     .describe("Array of the packages that were successfully installed"),
   execute: async ({ inputData }) => {
+    console.log(inputData);
     let successfullyInstalled: string[] = [];
 
-    for (let tool of inputData.tools) {
-      const res = await toolInstallerAgent.stream([
-        {
-          role: "user",
-          content: `
-          Here is the tool you need to install:
-            Name: ${tool.name}
-            Install Command (on Ubuntu, convert it to Arch): ${tool.installCommand}`,
-        },
-      ]);
+    const promptLines: string[] = [];
+    promptLines.push(`You are installing tools on Arch Linux.
+For EACH tool below:
+1) Call searchPackageRepository(...) to find the best matching Arch package (do not guess).
+2) Then call installTool(...) for the selected package.
+Prefer official Arch repositories when suitable; use AUR only if needed.
+Attempt every tool even if earlier ones fail.
+Return ONLY valid JSON: { "tools": [{ "package": string|null, "installed": boolean }, ...] }.
+The tools array MUST have exactly one item per requested tool, in the same order.
 
-      let agentOutput = "";
-      for await (const chunk of res.textStream) agentOutput += chunk;
+Tools to install:`);
 
-      const parsedOutput: InstallationStatus = JSON.parse(agentOutput);
+    inputData.tools.forEach((tool, idx) => {
+      promptLines.push(
+        `${idx + 1}) Name: ${tool.name}`,
+        `   Install Command (Ubuntu/Kali hint): ${tool.installCommand}`,
+      );
+    });
 
-      if (parsedOutput.installed)
-        successfullyInstalled.push(parsedOutput.package);
+    const res = await toolInstallerAgent.stream([
+      {
+        role: "user",
+        content: promptLines.join("\n"),
+      },
+    ]);
+
+    let agentOutput = "";
+    for await (const chunk of res.textStream) agentOutput += chunk;
+
+    const parsedOutput: InstallationResults = JSON.parse(agentOutput);
+
+    for (const item of parsedOutput.tools ?? []) {
+      if (item.installed && item.package)
+        successfullyInstalled.push(item.package);
     }
 
     return successfullyInstalled;

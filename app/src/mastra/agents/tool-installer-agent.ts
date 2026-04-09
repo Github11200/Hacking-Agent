@@ -71,15 +71,17 @@ export const toolInstallerAgent = new Agent({
     - Call installTool.
 
   OUTPUT FORMAT
-  Return ONLY valid JSON as an array. Each item MUST contain only the package name and whether it was installed:
-  [
-    {
-      "package": "<selected package name>" | null,
-      "installed": true | false
-    }
-  ]
+  Return ONLY valid JSON (no markdown, no code fences). The top-level value MUST be an object with a "tools" array:
+  {
+    "tools": [
+      {
+        "package": "<selected package name>" | null,
+        "installed": true | false
+      }
+    ]
+  }
 
-  - Include exactly one array item per requested tool entry (same order as input).
+  - Include exactly one tools[] item per requested tool entry (same order as input).
   - If no suitable package is found: package must be null and installed must be false.
   - If installTool fails (returns a string): installed must be false.
   - If installTool succeeds: installed must be true.`,

@@ -11,6 +11,10 @@ export interface Package {
 }
 
 export interface InstallationStatus {
-  package: string;
+  package: string | null;
   installed: boolean;
+}
+
+export interface InstallationResults {
+  tools: InstallationStatus[];
 }
