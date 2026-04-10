@@ -5,74 +5,35 @@ import { searchPackageRepository } from "../tools/search-package";
 import { installTool } from "../tools/install-tool";
 import { runCommand } from "../tools/run-command";
 import { getPackageUsage } from "../tools/package-usage-tool";
+import { getPackageInformation } from "../tools/package-info-tool";
 
 const memory = new Memory();
 
 export const penetrationAgent = new Agent({
   id: "penetrator-agent",
   name: "Penetration Agent",
-  instructions: `You are the Penetration Agent: an **authorized** penetration testing operator running on an Arch Linux host.
+  instructions: `
+  You are a penetration agent whose responsibility is to penetrate something based on the user's prompt.
 
-MISSION
-- Help the user assess security of **in-scope** targets only.
-- Provide clear evidence, severity, and next steps.
+  Two agents before you have already found relevant tools and installed them and you will be given a list of tools that were successfully installed.
 
-OPERATING PRINCIPLES
-- Work in small, verifiable steps: plan → run → interpret → decide.
-- Don’t guess results. Base conclusions only on observed tool output.
-- Use timeouts / rate limits; avoid interactive commands.
-- Minimize installs; install tools only when necessary.
+  Using these tools, you can figure out how to use them using the getPackageUsage tool which will use --help with the tool name. This tool requires the
+  following input:
 
-AVAILABLE TOOLS (YOU MUST USE THESE)
-- searchPackageRepository({ package }) => null | string
-  - Returns a string with two sections:
-    1) "Official Arch repositories packages: ..."
-    2) "User repository packages: ..."
-- installTool({ package, repository }) => true | string
-  - repository MUST be exactly one of:
-    - "Offical Arch Repositories" (pacman)
-    - "Arch User Repository (AUR)" (yay)
-- getPackageUsage("binaryName") => string | false
-  - Runs <binaryName> --help and returns the help text.
-- runCommand({ name, args }) => command output / status (use it for ALL terminal execution)
+  {
+    package: "name of the tool (e.g. hydra or nmap)"
+  }
 
-TOOL USAGE RULES
-A) Installing tools
-- ALWAYS call searchPackageRepository before installTool. Never guess package names.
-- Prefer "Offical Arch Repositories" when a suitable match exists.
-- Use AUR only if no suitable official package exists.
-- If installation fails, do not loop forever; try 1–2 alternative queries then proceed with available tools.
+  You also have another tool for running commands in the terminal. This tool requries the command name and arguments that need to be passed. If you
+  are unsure of the arguments required then make sure to use the getPackageUsage tool first.
 
-B) Running commands
-- Always pass args as an array of strings.
-- Prefer calling binaries directly (e.g., name: "nmap") rather than running a shell.
-- If a command could run long, include safe bounds (e.g., nmap timing, curl --max-time, ffuf -t, etc.).
-- If you don’t know a tool’s flags, call getPackageUsage first.
+  Continue looping through these tools and running commands until the desired penetration test has been completed.
 
-PENTEST WORKFLOW (DEFAULT)
-1) Confirm scope + rules of engagement (ROE).
-2) Reconnaissance: DNS/WHOIS (if relevant), basic reachability.
-3) Service discovery: targeted, rate-limited scanning.
-4) Enumeration per service (HTTP, SSH, SMB, DBs, etc.).
-5) Vulnerability identification: version checks + safe checks.
-6) Exploitation ONLY if explicitly allowed; prefer PoC validation with minimal impact.
-7) Document findings with:
-   - Title, severity, affected asset(s)
-   - Evidence (command + relevant output)
-   - Impact and recommended remediation
-
-RESPONSE FORMAT (EVERY TURN)
-Use this structure:
-- Scope/Assumptions: (what’s in-scope; what you’re assuming)
-- Plan: (next 2–5 steps)
-- Actions: (commands you ran via tools)
-- Findings: (bullet list, severity)
-- Next: (what you need from the user or what you’ll run next)
+  Once you are done, and only when the penetration has been completed, can you tell the user the outcome of the penetrationo test and any information
+  that was gathered.
 `,
   model: ollamaModel,
   tools: {
-    searchPackageRepository,
-    installTool,
     runCommand,
     getPackageUsage,
   },

@@ -17,7 +17,7 @@ PROCESS:
 2. USE getPackageInformation tool for EACH candidate (call the tool multiple times if needed)
 3. From the package info, extract the exact install command and verify tool details
 4. Select the MOST relevant tools based on the package information, if all are relevant, give them all.
-5. Output ONLY the JSON below - NO explanations
+5. Output ONLY the JSON below - NO explanations and no other characters as this raw JSON will be parsed
 
 OUTPUT FORMAT:
 {
@@ -32,7 +32,7 @@ OUTPUT FORMAT:
 RULES:
 - ALWAYS call getPackageInformation before outputting
 - Extract "install command" from package info "How to install" section
-- Output ONLY valid JSON, 2-4 tools maximum`,
+- Output ONLY valid JSON`,
   model: ollamaModel,
   tools: { getPackageInformation },
   memory,

@@ -107,4 +107,6 @@ const ollamaProvider = createOllama({
   baseURL: "http://localhost:3000/api",
 });
 
-export const ollamaModel = ollamaProvider("gemma4:e4b");
+export const ollamaModel = ollamaProvider(
+  "fredrezones55/Qwen3.5-Uncensored-HauhauCS-Aggressive:9b",
+);

@@ -73,29 +73,17 @@ const installTools = createStep({
     console.log(inputData);
     let successfullyInstalled: string[] = [];
 
-    const promptLines: string[] = [];
-    promptLines.push(`You are installing tools on Arch Linux.
-For EACH tool below:
-1) Call searchPackageRepository(...) to find the best matching Arch package (do not guess).
-2) Then call installTool(...) for the selected package.
-Prefer official Arch repositories when suitable; use AUR only if needed.
-Attempt every tool even if earlier ones fail.
-Return ONLY valid JSON: { "tools": [{ "package": string|null, "installed": boolean }, ...] }.
-The tools array MUST have exactly one item per requested tool, in the same order.
-
-Tools to install:`);
+    let prompt =
+      "Search the package repository for the following tools and install them:\n\n";
 
     inputData.tools.forEach((tool, idx) => {
-      promptLines.push(
-        `${idx + 1}) Name: ${tool.name}`,
-        `   Install Command (Ubuntu/Kali hint): ${tool.installCommand}`,
-      );
+      prompt += `- Name: ${tool.name}\nInstall Command (Ubuntu/Kali hint): ${tool.installCommand}\n\n`;
     });
 
     const res = await toolInstallerAgent.stream([
       {
         role: "user",
-        content: promptLines.join("\n"),
+        content: prompt,
       },
     ]);
 

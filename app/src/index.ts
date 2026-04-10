@@ -4,18 +4,24 @@ import { mastra } from "./mastra";
 // const renderer = await createCliRenderer({
 //   exitOnCtrlC: true,
 // });
+//
 
-const res = await fetch(
-  `https://archlinux.org/packages/search/json/?q=${"hashcat"}`,
-)
-  .then((data) => data.json())
-  .then((data) => {
-    let names = [];
-    data.results.map((result, _) => {
-      names.push(result.pkgname);
-    });
+let prompt =
+  "Search the package repository for the following tools and install them:\n\n";
 
-    return names;
-  });
+const tools = [
+  {
+    name: "hashcat",
+    installCommand: "install",
+  },
+  {
+    name: "hashcat",
+    installCommand: "install",
+  },
+];
 
-console.log(res);
+tools.forEach((tool, idx) => {
+  prompt += `- Name: ${tool.name}\nInstall Command (Ubuntu/Kali hint): ${tool.installCommand}\n\n`;
+});
+
+console.log(prompt);

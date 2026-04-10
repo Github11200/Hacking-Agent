@@ -14,16 +14,21 @@ export const runCommand = new Tool({
       .array(z.string())
       .describe("The arguments to pass to the command, e.g. `-a`, `--needed`"),
   }),
-  outputSchema: z
-    .boolean()
-    .describe("Returns true if the command executed successfully")
-    .or(z.string().describe("The error message from running the command")),
+  outputSchema: z.object({
+    message: z.string().describe("The output from running the command"),
+    successful: z
+      .boolean()
+      .describe("Whether running the command was successful or not"),
+  }),
   execute: async (commandInformation) => {
+    console.log("=================================");
     const helpCommand = spawn(commandInformation.name, commandInformation.args);
 
+    let commandOutput = "";
     helpCommand.stdout.on("data", (data) => {
       const decoder = new StringDecoder("utf8");
       const message = decoder.write(data);
+      commandOutput += message;
       console.log(message);
     });
 
@@ -34,6 +39,16 @@ export const runCommand = new Tool({
       },
     );
 
-    return commandResult;
+    if (typeof commandResult === "string") {
+      return {
+        message: `Output: ${commandOutput}\nError: ${commandResult}`,
+        successful: false,
+      };
+    } else {
+      return {
+        message: commandOutput,
+        successful: true,
+      };
+    }
   },
 });

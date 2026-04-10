@@ -6,11 +6,13 @@ import { StringDecoder } from "string_decoder";
 export const getPackageUsage = new Tool({
   id: "package-usage-tool",
   description: "Gets information about the package using --help",
-  inputSchema: z
-    .string()
-    .describe(
-      "The exact name of the downloaded package that you want to use --help on",
-    ),
+  inputSchema: z.object({
+    package: z
+      .string()
+      .describe(
+        "The exact name of the downloaded package that you want to use --help on",
+      ),
+  }),
   outputSchema: z
     .string()
     .describe("The output of the --help command")
@@ -21,8 +23,8 @@ export const getPackageUsage = new Tool({
           "Returns false if the command couldn't run since the pacakge doesn't exist",
         ),
     ),
-  execute: async (packageName) => {
-    const helpCommand = spawn(packageName, ["--help"]);
+  execute: async (data) => {
+    const helpCommand = spawn(data.package, ["--help"]);
 
     let commandOutput = "";
     helpCommand.stdout.on("data", (data) => {
