@@ -2,6 +2,8 @@ import { Tool } from "@mastra/core/tools";
 import z from "zod";
 import { spawn } from "child_process";
 import { StringDecoder } from "string_decoder";
+import { $ } from "execa";
+import { stderr } from "bun";
 
 export const runCommand = new Tool({
   id: "run-command",
@@ -22,33 +24,24 @@ export const runCommand = new Tool({
   }),
   execute: async (commandInformation) => {
     console.log("=================================");
-    const helpCommand = spawn(commandInformation.name, commandInformation.args);
+    let command = commandInformation.name;
+    if (commandInformation.args !== undefined)
+      commandInformation.args.forEach((arg, _) => {
+        command += ` ${arg}`;
+      });
 
-    let commandOutput = "";
-    helpCommand.stdout.on("data", (data) => {
-      const decoder = new StringDecoder("utf8");
-      const message = decoder.write(data);
-      commandOutput += message;
-      console.log(message);
-    });
+    const result = await $`${command}`;
 
-    const commandResult: boolean | string = await new Promise(
-      (resolve, reject) => {
-        helpCommand.on("close", (_) => resolve(true));
-        helpCommand.on("error", (err) => reject(err.message));
-      },
-    );
-
-    if (typeof commandResult === "string") {
+    if (result.failed) {
       return {
-        message: `Output: ${commandOutput}\nError: ${commandResult}`,
+        message: `Error: ${result.stderr}`,
         successful: false,
       };
-    } else {
-      return {
-        message: commandOutput,
-        successful: true,
-      };
     }
+
+    return {
+      message: `Output: ${result.stdout}`,
+      successful: true,
+    };
   },
 });
