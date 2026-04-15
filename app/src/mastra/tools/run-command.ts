@@ -1,9 +1,6 @@
 import { Tool } from "@mastra/core/tools";
 import z from "zod";
-import { spawn } from "child_process";
-import { StringDecoder } from "string_decoder";
-import { $ } from "execa";
-import { stderr } from "bun";
+import { $, execa } from "execa";
 
 export const runCommand = new Tool({
   id: "run-command",
@@ -14,7 +11,8 @@ export const runCommand = new Tool({
       .describe("The name of the command, e.g. `ls` or `hashcat`"),
     args: z
       .array(z.string())
-      .describe("The arguments to pass to the command, e.g. `-a`, `--needed`"),
+      .describe("The arguments to pass to the command, e.g. `-a`, `--needed`")
+      .or(z.undefined()),
   }),
   outputSchema: z.object({
     message: z.string().describe("The output from running the command"),
@@ -24,13 +22,12 @@ export const runCommand = new Tool({
   }),
   execute: async (commandInformation) => {
     console.log("=================================");
-    let command = commandInformation.name;
-    if (commandInformation.args !== undefined)
-      commandInformation.args.forEach((arg, _) => {
-        command += ` ${arg}`;
-      });
 
-    const result = await $`${command}`;
+    const result = await execa(
+      commandInformation.name,
+      commandInformation.args,
+      { shell: true },
+    );
 
     if (result.failed) {
       return {

@@ -1,11 +1,6 @@
 import { Agent } from "@mastra/core/agent";
 import { ollamaModel } from "../lib/lib";
 import { Memory } from "@mastra/memory";
-import { searchPackageRepository } from "../tools/search-package";
-import { installTool } from "../tools/install-tool";
-import { runCommand } from "../tools/run-command";
-import { getPackageUsage } from "../tools/package-usage-tool";
-import { getPackageInformation } from "../tools/package-info-tool";
 
 const memory = new Memory();
 
@@ -36,9 +31,5 @@ Normalize by grouping options: target/input, auth, scan behavior, output/logging
 Prefer dense structure over prose; target about 25-40% of original size.
 `,
   model: ollamaModel,
-  tools: {
-    runCommand,
-    getPackageUsage,
-  },
   memory,
 });

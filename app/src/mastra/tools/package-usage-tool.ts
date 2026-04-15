@@ -1,7 +1,7 @@
 import { Tool } from "@mastra/core/tools";
 import z from "zod";
-import { spawn } from "child_process";
-import { StringDecoder } from "string_decoder";
+import { execa } from "execa";
+import { synthesizerAgent } from "../agents/synthesizer-agent";
 
 export const getPackageUsage = new Tool({
   id: "package-usage-tool",
@@ -13,39 +13,33 @@ export const getPackageUsage = new Tool({
         "The exact name of the downloaded package that you want to use --help on",
       ),
   }),
-  outputSchema: z
-    .string()
-    .describe("The output of the --help command")
-    .or(
-      z
-        .boolean()
-        .describe(
-          "Returns false if the command couldn't run since the pacakge doesn't exist",
-        ),
-    ),
+  outputSchema: z.object({
+    message: z.string().describe("The output from running the command"),
+    successful: z
+      .boolean()
+      .describe("Whether running the command was successful or not"),
+  }),
   execute: async (data) => {
-    const helpCommand = spawn(data.package, ["--help"]);
+    const result = await execa(data.package, ["-h"], { shell: true });
 
-    let commandOutput = "";
-    helpCommand.stdout.on("data", (data) => {
-      const decoder = new StringDecoder("utf8");
-      const message = decoder.write(data);
-      commandOutput += message;
-    });
+    if (result.failed) {
+      console.log("ahsdlifjals;dfkasjdfl;k");
+      return {
+        message: `Error: ${result.stderr}`,
+        successful: false,
+      };
+    }
 
-    const commandResult: string | boolean = await new Promise(
-      (resolve, reject) => {
-        helpCommand.on("exit", (_) => {
-          resolve(true);
-        });
+    // const stream = await synthesizerAgent.stream(
+    //   `Synthesize the following output:\n${result.stdout}`,
+    // );
 
-        helpCommand.on("error", (err) => {
-          reject(err.message);
-        });
-      },
-    );
+    let synthesizedOutput = "";
+    // for await (const chunk of stream.textStream) synthesizedOutput += chunk;
 
-    if (typeof commandResult === "string") return false;
-    return commandOutput;
+    return {
+      message: `Output: ${synthesizedOutput}`,
+      successful: true,
+    };
   },
 });
