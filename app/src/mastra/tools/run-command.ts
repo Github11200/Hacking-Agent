@@ -20,24 +20,28 @@ export const runCommand = new Tool({
       .boolean()
       .describe("Whether running the command was successful or not"),
   }),
-  execute: async (commandInformation) => {
+  onInputDelta: ({ inputTextDelta }) => {
+    console.log(inputTextDelta);
+  },
+  execute: async (commandInformation, context) => {
     console.log("=================================");
 
-    const result = await execa(
-      commandInformation.name,
-      commandInformation.args,
-      { shell: true },
-    );
+    const result = execa(commandInformation.name, commandInformation.args, {
+      shell: true,
+    });
 
-    if (result.failed) {
-      return {
-        message: `Error: ${result.stderr}`,
-        successful: false,
-      };
+    let data = "";
+    for await (const line of result) {
+      data += line;
+      await context?.writer?.write({
+        content: line,
+        type: "data",
+        id: "run-command",
+      });
     }
 
     return {
-      message: `Output: ${result.stdout}`,
+      message: `Output: ${data}`,
       successful: true,
     };
   },

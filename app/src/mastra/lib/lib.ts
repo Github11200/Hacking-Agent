@@ -1,4 +1,5 @@
 import { createOllama } from "ollama-ai-provider-v2";
+import { Agent } from "@mastra/core/agent";
 
 export const toolNamesList = [
   "hashcat",
