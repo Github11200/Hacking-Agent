@@ -1,11 +1,8 @@
 import { Agent } from "@mastra/core/agent";
 import { ollamaModel } from "../lib/lib";
 import { Memory } from "@mastra/memory";
-import { searchPackageRepository } from "../tools/search-package";
-import { installTool } from "../tools/install-tool";
 import { runCommand } from "../tools/run-command";
 import { getPackageUsage } from "../tools/package-usage-tool";
-import { getPackageInformation } from "../tools/package-info-tool";
 
 const memory = new Memory();
 
@@ -30,7 +27,7 @@ export const penetrationAgent = new Agent({
   Continue looping through these tools and running commands until the desired penetration test has been completed.
 
   Once you are done, and only when the penetration has been completed, can you tell the user the outcome of the penetrationo test and any information
-  that was gathered.
+  that was gathered. Do not stop midway after running a tool, get all the information, and report it back to the user.
 `,
   model: ollamaModel,
   tools: {

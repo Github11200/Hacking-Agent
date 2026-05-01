@@ -2,6 +2,7 @@ import { Tool } from "@mastra/core/tools";
 import z from "zod";
 import { execa } from "execa";
 import { synthesizerAgent } from "../agents/synthesizer-agent";
+import { mastra } from "..";
 
 export const getPackageUsage = new Tool({
   id: "package-usage-tool",
@@ -20,10 +21,9 @@ export const getPackageUsage = new Tool({
       .describe("Whether running the command was successful or not"),
   }),
   execute: async (data) => {
-    const result = await execa(data.package, ["-h"], { shell: true });
+    const result = await execa(data.package, ["--help"], { shell: true });
 
     if (result.failed) {
-      console.log("ahsdlifjals;dfkasjdfl;k");
       return {
         message: `Error: ${result.stderr}`,
         successful: false,
@@ -34,11 +34,14 @@ export const getPackageUsage = new Tool({
     //   `Synthesize the following output:\n${result.stdout}`,
     // );
 
-    let synthesizedOutput = "";
-    // for await (const chunk of stream.textStream) synthesizedOutput += chunk;
+    // let synthesizedOutput = "";
+    // for await (const chunk of stream.textStream) {
+    //   console.log(chunk);
+    //   synthesizedOutput += chunk;
+    // }
 
     return {
-      message: `Output: ${synthesizedOutput}`,
+      message: `Output: ${result.stdout}`,
       successful: true,
     };
   },

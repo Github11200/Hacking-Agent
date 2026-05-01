@@ -23,25 +23,34 @@ export const runCommand = new Tool({
   onInputDelta: ({ inputTextDelta }) => {
     console.log(inputTextDelta);
   },
-  execute: async (commandInformation, context) => {
+  execute: async (commandInformation) => {
     console.log("=================================");
 
-    const result = execa(commandInformation.name, commandInformation.args, {
-      shell: true,
-    });
+    let shellCommandOptions = {};
+    if (commandInformation.name === "sudo")
+      shellCommandOptions = { shell: true };
+    else shellCommandOptions = { shell: true, timeout: 5000 };
 
-    let data = "";
-    for await (const line of result) {
-      data += line;
-      await context?.writer?.write({
-        content: line,
-        type: "data",
-        id: "run-command",
-      });
+    const result = await execa(
+      commandInformation.name,
+      commandInformation.args,
+      shellCommandOptions,
+    );
+
+    if (result.timedOut) {
+      return {
+        message: `Command timed out: ${result.stdout}`,
+        successful: false,
+      };
+    } else if (result.failed) {
+      return {
+        message: `Error: ${result.stderr}`,
+        successful: false,
+      };
     }
 
     return {
-      message: `Output: ${data}`,
+      message: `Output: ${result.stdout}`,
       successful: true,
     };
   },

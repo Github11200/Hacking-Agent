@@ -15,6 +15,7 @@ import { toolPickerAgent } from "./agents/tool-picker-agent";
 import { toolInstallerAgent } from "./agents/tool-installer-agent";
 import { penetrationAgent } from "./agents/penetrator-agent";
 import { penetrationWorkflow } from "./workflows/penetration-workflow";
+import { synthesizerAgent } from "./agents/synthesizer-agent";
 
 export const mastra = new Mastra({
   workflows: { weatherWorkflow, penetrationWorkflow },
@@ -23,6 +24,7 @@ export const mastra = new Mastra({
     toolPickerAgent,
     toolInstallerAgent,
     penetrationAgent,
+    synthesizerAgent,
   },
   storage: new MastraCompositeStore({
     id: "composite-storage",

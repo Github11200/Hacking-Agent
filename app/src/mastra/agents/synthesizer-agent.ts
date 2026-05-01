@@ -30,6 +30,6 @@ Always output:
 Normalize by grouping options: target/input, auth, scan behavior, output/logging, performance, evasion/safety, misc.
 Prefer dense structure over prose; target about 25-40% of original size.
 `,
-  model: ollamaModel,
+  model: "google/gemini-2.5-flash",
   memory,
 });
