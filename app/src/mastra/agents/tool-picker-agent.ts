@@ -25,7 +25,12 @@ OUTPUT FORMAT:
     {
       "name": "exact-tool-name",
       "installCommand": "sudo apt install tool-name"
-    }
+    },
+    {
+      "name": "exact-tool-name-2",
+      "installCommand": "sudo apt install tool-name-2"
+    },
+    ...
   ]
 }
 

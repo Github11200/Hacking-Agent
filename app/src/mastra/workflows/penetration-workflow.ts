@@ -23,7 +23,7 @@ const getTools = createStep({
       }),
     ),
   }),
-  execute: async ({ inputData }) => {
+  execute: async ({ inputData, writer }) => {
     userPrompt = inputData;
 
     let prompt = `This is what the user would like to achieve: ${inputData}
@@ -35,19 +35,17 @@ const getTools = createStep({
       prompt += `- ${tool}\n`;
     });
 
-    const response = await toolPickerAgent.stream([
+    const stream = await toolPickerAgent.stream([
       {
         role: "user",
         content: prompt,
       },
     ]);
 
-    let jsonResponse = "";
+    const [uiStream, captureStream] = stream.textStream.tee();
+    await uiStream.pipeTo(writer);
 
-    for await (const chunk of response.textStream) {
-      process.stdout.write(chunk);
-      jsonResponse += chunk;
-    }
+    const jsonResponse = await new Response(captureStream).text();
 
     const toolsList: ToolsList = JSON.parse(jsonResponse);
 
@@ -69,7 +67,7 @@ const installTools = createStep({
   outputSchema: z
     .array(z.string())
     .describe("Array of the packages that were successfully installed"),
-  execute: async ({ inputData }) => {
+  execute: async ({ inputData, writer }) => {
     console.log(inputData);
     let successfullyInstalled: string[] = [];
 
@@ -80,15 +78,17 @@ const installTools = createStep({
       prompt += `- Name: ${tool.name}\nInstall Command (Ubuntu/Kali hint): ${tool.installCommand}\n\n`;
     });
 
-    const res = await toolInstallerAgent.stream([
+    const stream = await toolInstallerAgent.stream([
       {
         role: "user",
         content: prompt,
       },
     ]);
 
-    let agentOutput = "";
-    for await (const chunk of res.textStream) agentOutput += chunk;
+    const [uiStream, captureStream] = stream.textStream.tee();
+    await uiStream.pipeTo(writer);
+
+    const agentOutput = await new Response(captureStream).text();
 
     const parsedOutput: InstallationResults = JSON.parse(agentOutput);
 
@@ -108,7 +108,7 @@ const penetrate = createStep({
     .array(z.string())
     .describe("Array of the packages that were successfully installed"),
   outputSchema: z.string().describe("The output of the LLM"),
-  execute: async ({ inputData }) => {
+  execute: async ({ inputData, writer }) => {
     let prompt = `This is the user's prompt: ${userPrompt}\nThese tools were successfully installed:\n`;
 
     for (const tool of inputData) prompt += `- ${tool}\n`;
@@ -123,8 +123,10 @@ const penetrate = createStep({
       },
     ]);
 
-    let res = "";
-    for await (const chunk of stream.textStream) res += chunk;
+    const [uiStream, captureStream] = stream.textStream.tee();
+    await uiStream.pipeTo(writer);
+
+    const res = await new Response(captureStream).text();
 
     return res;
   },

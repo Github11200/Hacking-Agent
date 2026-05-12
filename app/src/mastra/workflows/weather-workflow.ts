@@ -93,7 +93,7 @@ const planActivities = createStep({
   outputSchema: z.object({
     activities: z.string(),
   }),
-  execute: async ({ inputData, mastra }) => {
+  execute: async ({ inputData, mastra, writer }) => {
     const forecast = inputData;
 
     if (!forecast) {
@@ -154,12 +154,13 @@ const planActivities = createStep({
       },
     ]);
 
-    let activitiesText = "";
-
-    for await (const chunk of response.textStream) {
-      process.stdout.write(chunk);
-      activitiesText += chunk;
+    const [uiStream, captureStream] = response.textStream.tee();
+    if (writer) {
+      await uiStream.pipeTo(writer);
+    } else {
+      await uiStream.cancel();
     }
+    const activitiesText = await new Response(captureStream).text();
 
     return {
       activities: activitiesText,
